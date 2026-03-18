@@ -29,8 +29,8 @@ export const designs: DesignConfig[] = [
     id: "sr-eid-2",
     name: "Light",
     image: "/designs/sr-eid-2.png",
-    // Empty space below candy icon (~60%) and above logo (~87%)
-    textPosition: { x: 0.5, y: 0.73 },
+    // Empty space below candy icon (~83%) and above logo (~92%)
+    textPosition: { x: 0.5, y: 0.87 },
     maxFontSize: 52,
     minFontSize: 24,
     fontFamily: "Inter, system-ui, sans-serif",
