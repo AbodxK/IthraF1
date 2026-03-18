@@ -82,9 +82,9 @@ function DesignCard({
 
 export default function DesignGallery({ selectedDesign, onSelect }: DesignGalleryProps) {
   return (
-    <div className="w-full max-w-3xl mx-auto relative z-10">
+    <div className="w-full max-w-2xl mx-auto relative z-10">
       <h2 className="text-xl font-bold text-text mb-4">Choose a Design</h2>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {designs.map((design, i) => (
           <DesignCard
             key={design.id}

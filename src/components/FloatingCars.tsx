@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "./ThemeProvider";
+import { playTireScreech } from "@/lib/tire-sound";
 
 const CAR_COUNT = 8;
 
-// F1 car SVG as inline component
-function F1CarSVG({ color, size, flipped }: { color: string; size: number; flipped: boolean }) {
+// F1 car SVG — always faces right, container handles direction
+function F1CarSVG({ color, size }: { color: string; size: number }) {
   return (
     <svg
       width={size}
       height={size * 0.35}
       viewBox="0 0 120 42"
       fill="none"
-      style={{ transform: flipped ? "scaleX(-1)" : undefined }}
     >
       {/* Body */}
       <path d="M10 28 Q5 28 5 24 L8 20 Q12 14 25 14 L60 12 Q75 10 90 12 L105 14 Q115 16 115 22 L115 26 Q115 28 110 28 Z" fill={color} />
@@ -57,7 +57,7 @@ interface PhysicsCar {
   vy: number;
   size: number;
   colorIndex: number;
-  angle: number;
+  facingRight: boolean;
   alive: boolean;
   launching: boolean;
   launchVx: number;
@@ -92,15 +92,17 @@ function randomCar(id: number, entering = false): PhysicsCar {
     y = 50 + Math.random() * (h - 150);
   }
 
+  const initialVx = entering ? (x < 0 ? Math.abs(speed) : -Math.abs(speed)) : vx;
+
   return {
     id,
     x,
     y,
-    vx: entering ? (x < 0 ? Math.abs(speed) : -Math.abs(speed)) : vx,
+    vx: initialVx,
     vy,
     size,
     colorIndex: Math.floor(Math.random() * carColors.length),
-    angle: 0,
+    facingRight: initialVx >= 0,
     alive: true,
     launching: false,
     launchVx: 0,
@@ -110,13 +112,15 @@ function randomCar(id: number, entering = false): PhysicsCar {
   };
 }
 
-function LaunchTrail({ x, y, angle }: { x: number; y: number; angle: number }) {
+function LaunchTrail({ x, y, facingRight }: { x: number; y: number; facingRight: boolean }) {
   const lines = Array.from({ length: 5 }, (_, i) => ({
     id: i,
     length: 30 + Math.random() * 40,
     offset: i * 6 - 12,
     delay: Math.random() * 0.1,
   }));
+
+  const dir = facingRight ? 1 : -1;
 
   return (
     <div className="fixed pointer-events-none z-30" style={{ left: x, top: y }}>
@@ -129,9 +133,9 @@ function LaunchTrail({ x, y, angle }: { x: number; y: number; angle: number }) {
             height: 2,
             backgroundColor: "#E91E90",
             opacity: 0.6,
-            transform: `rotate(${angle}rad) translateY(${l.offset}px)`,
-            ["--tx" as string]: `${-Math.cos(angle) * 60}px`,
-            ["--ty" as string]: `${-Math.sin(angle) * 60}px`,
+            transform: `translateY(${l.offset}px)`,
+            ["--tx" as string]: `${-dir * 60}px`,
+            ["--ty" as string]: `${l.offset * 0.3}px`,
             animationDelay: `${l.delay}s`,
           }}
         />
@@ -156,7 +160,7 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
   const { theme } = useTheme();
   const carsRef = useRef<PhysicsCar[]>([]);
   const [renderCars, setRenderCars] = useState<PhysicsCar[]>([]);
-  const [trails, setTrails] = useState<Array<{ id: number; x: number; y: number; angle: number }>>([]);
+  const [trails, setTrails] = useState<Array<{ id: number; x: number; y: number; facingRight: boolean }>>([]);
   const animRef = useRef<number>(0);
   const nextId = useRef(CAR_COUNT);
 
@@ -183,8 +187,10 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
         c.x += c.vx;
         c.y += c.vy;
 
-        // Angle follows velocity direction
-        c.angle = Math.atan2(c.vy, c.vx);
+        // Update facing direction based on horizontal velocity
+        if (Math.abs(c.vx) > 0.05) {
+          c.facingRight = c.vx > 0;
+        }
 
         // Bounce off edges
         if (c.x < -20) c.vx = Math.abs(c.vx);
@@ -228,18 +234,19 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
 
       car.launching = true;
       onLaunch?.();
+      playTireScreech();
 
-      // Calculate launch direction (same as current heading, but much faster)
+      // Launch in facing direction
       const speed = 30;
-      const angle = car.angle;
-      car.launchVx = Math.cos(angle) * speed;
-      car.launchVy = Math.sin(angle) * speed;
+      const dir = car.facingRight ? 1 : -1;
+      car.launchVx = dir * speed;
+      car.launchVy = car.vy * 3;
 
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const trailId = Date.now() + id;
-      setTrails((prev) => [...prev, { id: trailId, x: cx, y: cy, angle }]);
+      setTrails((prev) => [...prev, { id: trailId, x: cx, y: cy, facingRight: car.facingRight }]);
 
       // Animate the launch
       let frame = 0;
@@ -280,8 +287,8 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
               opacity: car.opacity,
               pointerEvents: "auto",
               willChange: "left, top, opacity",
-              transform: `rotate(${car.angle}rad)`,
-              transition: car.launching ? "none" : undefined,
+              // Only flip horizontally — no rotation, no upside down
+              transform: car.facingRight ? "scaleX(1)" : "scaleX(-1)",
             }}
           >
             <div
@@ -291,7 +298,6 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
               <F1CarSVG
                 color={carColors[car.colorIndex]}
                 size={car.size}
-                flipped={car.vx < 0 && !car.launching}
               />
             </div>
           </div>
@@ -299,7 +305,7 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
       </div>
 
       {trails.map((trail) => (
-        <LaunchTrail key={trail.id} x={trail.x} y={trail.y} angle={trail.angle} />
+        <LaunchTrail key={trail.id} x={trail.x} y={trail.y} facingRight={trail.facingRight} />
       ))}
     </>
   );

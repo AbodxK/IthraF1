@@ -10,12 +10,13 @@
   --color-accent: #C0C0C0;
   --color-accent-gold: #FFD700;
 
-  --color-bg: #F5F5F5;
+  /* Light mode — matches Design 2 (white/light background) */
+  --color-bg: #F8F4F0;
   --color-bg-card: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-text: #1E1E1E;
-  --color-text-muted: #666666;
-  --color-border: #E0E0E0;
+  --color-text: #2D1B3D;
+  --color-text-muted: #7A6688;
+  --color-border: #E8D8F0;
 
   --animate-fade-in: fade-in 0.6s ease-out both;
   --animate-slide-up: slide-up 0.5s ease-out both;
@@ -56,13 +57,14 @@
   }
 }
 
+/* Dark mode — matches Design 1 (purple/magenta gradient feel) */
 html[data-theme="dark"] {
-  --color-bg: #0A0A0A;
-  --color-bg-card: #151515;
-  --color-surface: #1E1E1E;
-  --color-text: #F5F5F5;
-  --color-text-muted: #999999;
-  --color-border: #2A2A2A;
+  --color-bg: #1A0A2E;
+  --color-bg-card: rgba(255,255,255,0.08);
+  --color-surface: rgba(255,255,255,0.1);
+  --color-text: #F5F0FF;
+  --color-text-muted: #B8A0D0;
+  --color-border: rgba(255,255,255,0.12);
 }
 
 html {
@@ -70,29 +72,28 @@ html {
 }
 
 body {
-  background-color: var(--color-bg);
   color: var(--color-text);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Light mode background */
+html[data-theme="light"] body {
+  background: var(--color-bg);
+}
+
+/* Dark mode — purple/magenta gradient matching Design 1 */
+html[data-theme="dark"] body {
+  background: linear-gradient(180deg, #1A0A2E 0%, #3D1259 25%, #7B2D8E 50%, #C4167A 75%, #E91E90 100%);
+  background-attachment: fixed;
+}
+
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(233,30,144,0.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
 
 ::selection {
-  background-color: rgba(233, 30, 144, 0.2);
+  background-color: rgba(233, 30, 144, 0.25);
   color: var(--color-text);
-}
-
-/* Subtle texture for dark mode */
-html[data-theme="dark"] body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.015) 1px, transparent 0);
-  background-size: 16px 16px;
-  pointer-events: none;
-  z-index: 0;
 }
