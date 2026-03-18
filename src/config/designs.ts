@@ -16,8 +16,8 @@ export const designs: DesignConfig[] = [
     id: "sr-eid-1",
     name: "Crescent Moon",
     image: "/designs/sr-eid-1.png",
-    // Name goes in the empty space below "Eid Mubarak" text (~65% down)
-    textPosition: { x: 0.5, y: 0.65 },
+    // Empty space between arabic text (~48%) and logo (~90%)
+    textPosition: { x: 0.5, y: 0.72 },
     maxFontSize: 52,
     minFontSize: 24,
     fontFamily: "Inter, system-ui, sans-serif",
@@ -29,8 +29,8 @@ export const designs: DesignConfig[] = [
     id: "sr-eid-2",
     name: "Hexagon",
     image: "/designs/sr-eid-2.png",
-    // Name goes below the hexagon shape (~62% down)
-    textPosition: { x: 0.5, y: 0.62 },
+    // Empty space below hexagon shape (~50%) before bottom
+    textPosition: { x: 0.5, y: 0.68 },
     maxFontSize: 52,
     minFontSize: 24,
     fontFamily: "Inter, system-ui, sans-serif",
@@ -42,8 +42,8 @@ export const designs: DesignConfig[] = [
     id: "sr-eid-3",
     name: "Dark Moon",
     image: "/designs/sr-eid-3.png",
-    // Name goes in the empty space below "Eid Mubarak" text (~62% down)
-    textPosition: { x: 0.5, y: 0.62 },
+    // Empty space below "Eid Mubarak" text (~58%) before bottom
+    textPosition: { x: 0.5, y: 0.73 },
     maxFontSize: 52,
     minFontSize: 24,
     fontFamily: "Inter, system-ui, sans-serif",
