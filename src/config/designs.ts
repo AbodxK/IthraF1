@@ -29,13 +29,13 @@ export const designs: DesignConfig[] = [
     id: "sr-eid-2",
     name: "Light",
     image: "/designs/sr-eid-2.png",
-    // Empty space below candy icon (~83%) and above logo (~92%)
-    textPosition: { x: 0.5, y: 0.87 },
+    // Top empty space — below logo (~8%) and above crescent (~30%)
+    textPosition: { x: 0.5, y: 0.20 },
     maxFontSize: 52,
     minFontSize: 24,
     fontFamily: "Inter, system-ui, sans-serif",
     arabicFontFamily: "Inter, system-ui, sans-serif",
-    textColor: "#2D1B3D",
-    textShadow: "0 1px 4px rgba(0,0,0,0.1)",
+    textColor: "#000000",
+    textShadow: "none",
   },
 ];
