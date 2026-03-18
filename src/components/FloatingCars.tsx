@@ -287,8 +287,8 @@ export default function FloatingCars({ onLaunch }: FloatingCarsProps) {
               opacity: car.opacity,
               pointerEvents: "auto",
               willChange: "left, top, opacity",
-              // Only flip horizontally — no rotation, no upside down
-              transform: car.facingRight ? "scaleX(1)" : "scaleX(-1)",
+              // SVG faces left by default, so flip when going right
+              transform: car.facingRight ? "scaleX(-1)" : "scaleX(1)",
             }}
           >
             <div
